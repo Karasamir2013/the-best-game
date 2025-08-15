@@ -1,26 +1,10 @@
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
 body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #cfe8ff;
-  font-family: system-ui, Arial, sans-serif;
+  text-align: center;
+  background-color: lightblue;
+  font-family: Arial, sans-serif;
 }
 
-h1 {
-  margin: 16px 0;
-}
-
-#gameCanvas {
-  border: 2px solid #000;
-  background: #e6e6e6;
-}
-
-.hint {
-  margin: 8px 0 16px;
-  font-size: 14px;
+canvas {
+  border: 2px solid black;
+  background-color: lightgray;
 }
