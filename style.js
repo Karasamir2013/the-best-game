@@ -55,3 +55,19 @@ function spawnTraffic() {
     });
   }
 }
+const restartBtn = document.getElementById("restartBtn");
+
+restartBtn.addEventListener("click", () => {
+  // Reset car position
+  car.x = 370;
+  car.y = 400;
+  
+  // Clear traffic
+  traffic = [];
+  
+  // Reset road speed
+  roadSpeed = 5;
+
+  // Optional: clear canvas immediately
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
