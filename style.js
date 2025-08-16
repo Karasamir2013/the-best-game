@@ -40,3 +40,18 @@ document.addEventListener("keydown", (e) => {
 });
 
 update();
+// Spawn traffic
+function spawnTraffic() {
+  if (Math.random() < 0.03) { // ⬅️ reduced from 0.15 to 0.03
+    let laneX = [160, 300, 440, 580];
+    let x = laneX[Math.floor(Math.random() * laneX.length)];
+    traffic.push({
+      x: x,
+      y: -50,
+      width: 60,
+      height: 30,
+      speed: roadSpeed - 1,
+      color: "blue"
+    });
+  }
+}
