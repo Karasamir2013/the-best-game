@@ -2,13 +2,37 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>City Adventure - Car Game</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Car Test</title>
+  <style>
+    body {
+      text-align: center;
+      background-color: lightblue;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid black;
+      background-color: lightgray;
+    }
+  </style>
 </head>
 <body>
-  <h1>City Adventure</h1>
-  <p>Move Car: Arrow Keys or WASD</p>
+  <h1>Car Test</h1>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
-  <script src="script.js"></script>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Draw a simple red car
+    ctx.fillStyle = "red";
+    ctx.fillRect(100, 100, 60, 30);
+
+    // Wheels
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.arc(110, 130, 8, 0, Math.PI * 2); 
+    ctx.arc(150, 130, 8, 0, Math.PI * 2);
+    ctx.fill();
+  </script>
 </body>
 </html>
