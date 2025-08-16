@@ -13,92 +13,54 @@
       border: 3px solid black;
       margin-top: 20px;
     }
+    #restartBtn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>🚗 Car Game</h1>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <br>
+  <button id="restartBtn">Restart Game</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    // Car object
     let car = {
-      x: 370,
-      y: 400,
+      x: 100,
+      y: 100,
       width: 60,
       height: 30,
       speed: 5,
       color: "red"
     };
 
+    // Traffic array and road speed
     let traffic = [];
-    let roadOffset = 0;
-    let roadSpeed = 5; // base road speed
-
-    // Draw road
-    function drawRoad() {
-      // Grass
-      ctx.fillStyle = "green";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Sidewalks
-      ctx.fillStyle = "#c0c0c0"; 
-      ctx.fillRect(0, 0, 120, canvas.height);
-      ctx.fillRect(canvas.width - 120, 0, 120, canvas.height);
-
-      // Road
-      ctx.fillStyle = "#1a1a1a";
-      ctx.fillRect(120, 0, canvas.width - 240, canvas.height);
-
-      // Center dashed line
-      ctx.strokeStyle = "yellow";
-      ctx.lineWidth = 5;
-      for (let y = -40; y < canvas.height; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, y + roadOffset);
-        ctx.lineTo(canvas.width / 2, y + 20 + roadOffset);
-        ctx.stroke();
-      }
-
-      // Lane markings
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 3;
-      for (let y = -30; y < canvas.height; y += 30) {
-        ctx.beginPath();
-        ctx.moveTo(260, y + roadOffset);
-        ctx.lineTo(260, y + 15 + roadOffset);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(canvas.width - 260, y + roadOffset);
-        ctx.lineTo(canvas.width - 260, y + 15 + roadOffset);
-        ctx.stroke();
-      }
-
-      // Scroll effect
-      roadOffset += roadSpeed;
-      if (roadOffset > 40) roadOffset = 0;
-    }
+    let roadSpeed = 5;
+    let animationId;
 
     // Draw car
-    function drawCar(c) {
-      ctx.fillStyle = c.color;
-      ctx.fillRect(c.x, c.y, c.width, c.height);
-
-      ctx.fillStyle = "lightgray";
-      ctx.fillRect(c.x + 10, c.y - 15, c.width - 20, 15);
+    function drawCar() {
+      ctx.fillStyle = car.color;
+      ctx.fillRect(car.x, car.y, car.width, car.height);
 
       ctx.fillStyle = "black";
       ctx.beginPath();
-      ctx.arc(c.x + 12, c.y + c.height, 8, 0, Math.PI * 2);
-      ctx.arc(c.x + c.width - 12, c.y + c.height, 8, 0, Math.PI * 2);
+      ctx.arc(car.x + 10, car.y + car.height, 8, 0, Math.PI * 2);
+      ctx.arc(car.x + car.width - 10, car.y + car.height, 8, 0, Math.PI * 2);
       ctx.fill();
     }
 
     // Spawn traffic
     function spawnTraffic() {
-      if (Math.random() < 0.15) { // spawn rate (higher = more cars)
+      if (Math.random() < 0.03) {
         let laneX = [160, 300, 440, 580];
         let x = laneX[Math.floor(Math.random() * laneX.length)];
         traffic.push({
@@ -106,70 +68,61 @@
           y: -50,
           width: 60,
           height: 30,
-          speed: roadSpeed - 1, // move with road
+          speed: roadSpeed - 1,
           color: "blue"
         });
-      }
-    }
-
-    function updateTraffic() {
-      for (let i = traffic.length - 1; i >= 0; i--) {
-        traffic[i].y += traffic[i].speed;
-        drawCar(traffic[i]);
-
-        if (traffic[i].y > canvas.height) {
-          traffic.splice(i, 1);
-        }
-
-        // Crash check
-        if (
-          car.x < traffic[i].x + traffic[i].width &&
-          car.x + car.width > traffic[i].x &&
-          car.y < traffic[i].y + traffic[i].height &&
-          car.y + car.height > traffic[i].y
-        ) {
-          alert("💥 Crash! Game Over");
-          traffic = [];
-          car.x = 370;
-          car.y = 400;
-          roadSpeed = 5;
-        }
       }
     }
 
     // Game loop
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawRoad();
-      drawCar(car);
+
+      drawCar();
+
+      // Draw traffic
+      for (let i = traffic.length - 1; i >= 0; i--) {
+        let t = traffic[i];
+        t.y += t.speed;
+        ctx.fillStyle = t.color;
+        ctx.fillRect(t.x, t.y, t.width, t.height);
+
+        if (
+          car.x < t.x + t.width &&
+          car.x + car.width > t.x &&
+          car.y < t.y + t.height &&
+          car.y + car.height > t.y
+        ) {
+          cancelAnimationFrame(animationId); // Stop game on crash
+          alert("💥 Crash! Click Restart to play again.");
+        }
+
+        if (t.y > canvas.height) traffic.splice(i, 1);
+      }
+
       spawnTraffic();
-      updateTraffic();
-      requestAnimationFrame(update);
+      animationId = requestAnimationFrame(update);
     }
 
     // Controls
     document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp" || e.key === "w") {
-        roadSpeed = 10; // accelerate
-      }
-      if (e.key === "ArrowDown" || e.key === "s") {
-        roadSpeed = 3; // slow down
-      }
+      if (e.key === "ArrowUp" || e.key === "w") car.y -= car.speed;
+      if (e.key === "ArrowDown" || e.key === "s") car.y += car.speed;
       if (e.key === "ArrowLeft" || e.key === "a") car.x -= car.speed;
       if (e.key === "ArrowRight" || e.key === "d") car.x += car.speed;
-
-      if (car.x < 120) car.x = 120;
-      if (car.x + car.width > canvas.width - 120) car.x = canvas.width - 120 - car.width;
     });
 
-    document.addEventListener("keyup", (e) => {
-      if (e.key === "ArrowUp" || e.key === "w" || e.key === "ArrowDown" || e.key === "s") {
-        roadSpeed = 5; // reset to normal speed when key released
-      }
+    // Restart button
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      car.x = 100;
+      car.y = 100;
+      traffic = [];
+      roadSpeed = 5;
+      update(); // Restart game loop
     });
 
+    // Start the game
     update();
   </script>
 </body>
 </html>
-<button id="restartBtn">Restart Game</button>
