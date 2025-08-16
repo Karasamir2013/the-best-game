@@ -32,77 +32,130 @@
       color: "red"
     };
 
+    let traffic = [];
+    let roadOffset = 0;
+
+    // Draw road
     function drawRoad() {
       // Grass
       ctx.fillStyle = "green";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Sidewalks
-      ctx.fillStyle = "#c0c0c0"; // gray sidewalk
+      ctx.fillStyle = "#c0c0c0"; 
       ctx.fillRect(0, 0, 120, canvas.height);
       ctx.fillRect(canvas.width - 120, 0, 120, canvas.height);
 
       // Road
-      ctx.fillStyle = "#1a1a1a"; // black asphalt
+      ctx.fillStyle = "#1a1a1a";
       ctx.fillRect(120, 0, canvas.width - 240, canvas.height);
 
-      // Center dashed yellow line
+      // Center dashed yellow line (scrolling effect)
       ctx.strokeStyle = "yellow";
       ctx.lineWidth = 5;
-      for (let y = 0; y < canvas.height; y += 40) {
+      for (let y = -40; y < canvas.height; y += 40) {
         ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, y);
-        ctx.lineTo(canvas.width / 2, y + 20);
+        ctx.moveTo(canvas.width / 2, y + roadOffset);
+        ctx.lineTo(canvas.width / 2, y + 20 + roadOffset);
         ctx.stroke();
       }
 
-      // White lane markings (left and right)
+      // Lane markings
       ctx.strokeStyle = "white";
       ctx.lineWidth = 3;
-      for (let y = 0; y < canvas.height; y += 30) {
+      for (let y = -30; y < canvas.height; y += 30) {
         ctx.beginPath();
-        ctx.moveTo(260, y);
-        ctx.lineTo(260, y + 15);
+        ctx.moveTo(260, y + roadOffset);
+        ctx.lineTo(260, y + 15 + roadOffset);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(canvas.width - 260, y);
-        ctx.lineTo(canvas.width - 260, y + 15);
+        ctx.moveTo(canvas.width - 260, y + roadOffset);
+        ctx.lineTo(canvas.width - 260, y + 15 + roadOffset);
         ctx.stroke();
       }
+
+      // Scroll movement
+      roadOffset += 5;
+      if (roadOffset > 40) roadOffset = 0;
     }
 
-    function drawCar() {
-      // Car body
-      ctx.fillStyle = car.color;
-      ctx.fillRect(car.x, car.y, car.width, car.height);
+    // Draw player car
+    function drawCar(c) {
+      ctx.fillStyle = c.color;
+      ctx.fillRect(c.x, c.y, c.width, c.height);
 
-      // Car roof
+      // Roof
       ctx.fillStyle = "lightgray";
-      ctx.fillRect(car.x + 10, car.y - 15, car.width - 20, 15);
+      ctx.fillRect(c.x + 10, c.y - 15, c.width - 20, 15);
 
       // Wheels
       ctx.fillStyle = "black";
       ctx.beginPath();
-      ctx.arc(car.x + 12, car.y + car.height, 8, 0, Math.PI * 2);
-      ctx.arc(car.x + car.width - 12, car.y + car.height, 8, 0, Math.PI * 2);
+      ctx.arc(c.x + 12, c.y + c.height, 8, 0, Math.PI * 2);
+      ctx.arc(c.x + c.width - 12, c.y + c.height, 8, 0, Math.PI * 2);
       ctx.fill();
     }
 
+    // Spawn traffic cars
+    function spawnTraffic() {
+      if (Math.random() < 0.03) {
+        let laneX = [160, 300, 440, 580]; // 4 lanes
+        let x = laneX[Math.floor(Math.random() * laneX.length)];
+        traffic.push({
+          x: x,
+          y: -50,
+          width: 60,
+          height: 30,
+          speed: 4,
+          color: "blue"
+        });
+      }
+    }
+
+    function updateTraffic() {
+      for (let i = traffic.length - 1; i >= 0; i--) {
+        traffic[i].y += traffic[i].speed;
+        drawCar(traffic[i]);
+
+        // Remove cars that go off screen
+        if (traffic[i].y > canvas.height) {
+          traffic.splice(i, 1);
+        }
+
+        // Collision detection
+        if (
+          car.x < traffic[i].x + traffic[i].width &&
+          car.x + car.width > traffic[i].x &&
+          car.y < traffic[i].y + traffic[i].height &&
+          car.y + car.height > traffic[i].y
+        ) {
+          alert("💥 Crash! Game Over");
+          traffic = [];
+          car.x = 370;
+          car.y = 400;
+        }
+      }
+    }
+
+    // Game loop
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawRoad();
-      drawCar();
+      drawCar(car);
+      spawnTraffic();
+      updateTraffic();
       requestAnimationFrame(update);
     }
 
+    // Controls
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowUp" || e.key === "w") car.y -= car.speed;
       if (e.key === "ArrowDown" || e.key === "s") car.y += car.speed;
       if (e.key === "ArrowLeft" || e.key === "a") car.x -= car.speed;
       if (e.key === "ArrowRight" || e.key === "d") car.x += car.speed;
 
-      // Keep car on road
+      // Stay on road
       if (car.x < 120) car.x = 120;
       if (car.x + car.width > canvas.width - 120) car.x = canvas.width - 120 - car.width;
       if (car.y < 0) car.y = 0;
