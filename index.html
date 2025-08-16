@@ -6,18 +6,17 @@
   <style>
     body {
       text-align: center;
-      background-color: #1e1e1e;
+      background-color: #87ceeb; /* sky blue */
       font-family: Arial, sans-serif;
     }
     canvas {
-      border: 3px solid white;
-      background-color: #2c2c2c; /* dark gray road */
+      border: 3px solid black;
       margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1 style="color:white;">🚗 Car Game</h1>
+  <h1>🚗 Car Game</h1>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
 
   <script>
@@ -30,26 +29,45 @@
       width: 60,
       height: 30,
       speed: 5,
-      color: "blue"
+      color: "red"
     };
 
     function drawRoad() {
-      // Fill background road
-      ctx.fillStyle = "#2c2c2c";
+      // Grass
+      ctx.fillStyle = "green";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Sidewalks
-      ctx.fillStyle = "#555";
-      ctx.fillRect(0, 0, 100, canvas.height); // left sidewalk
-      ctx.fillRect(canvas.width - 100, 0, 100, canvas.height); // right sidewalk
+      ctx.fillStyle = "#c0c0c0"; // gray sidewalk
+      ctx.fillRect(0, 0, 120, canvas.height);
+      ctx.fillRect(canvas.width - 120, 0, 120, canvas.height);
 
-      // Lane markings
+      // Road
+      ctx.fillStyle = "#1a1a1a"; // black asphalt
+      ctx.fillRect(120, 0, canvas.width - 240, canvas.height);
+
+      // Center dashed yellow line
       ctx.strokeStyle = "yellow";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 5;
       for (let y = 0; y < canvas.height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, y);
         ctx.lineTo(canvas.width / 2, y + 20);
+        ctx.stroke();
+      }
+
+      // White lane markings (left and right)
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      for (let y = 0; y < canvas.height; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(260, y);
+        ctx.lineTo(260, y + 15);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 260, y);
+        ctx.lineTo(canvas.width - 260, y + 15);
         ctx.stroke();
       }
     }
@@ -60,7 +78,7 @@
       ctx.fillRect(car.x, car.y, car.width, car.height);
 
       // Car roof
-      ctx.fillStyle = "lightblue";
+      ctx.fillStyle = "lightgray";
       ctx.fillRect(car.x + 10, car.y - 15, car.width - 20, 15);
 
       // Wheels
@@ -84,10 +102,10 @@
       if (e.key === "ArrowLeft" || e.key === "a") car.x -= car.speed;
       if (e.key === "ArrowRight" || e.key === "d") car.x += car.speed;
 
-      // Keep inside road (between sidewalks)
-      if (car.x < 100) car.x = 100;
+      // Keep car on road
+      if (car.x < 120) car.x = 120;
+      if (car.x + car.width > canvas.width - 120) car.x = canvas.width - 120 - car.width;
       if (car.y < 0) car.y = 0;
-      if (car.x + car.width > canvas.width - 100) car.x = canvas.width - 100 - car.width;
       if (car.y + car.height > canvas.height) car.y = canvas.height - car.height;
     });
 
