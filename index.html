@@ -6,17 +6,18 @@
   <style>
     body {
       text-align: center;
-      background-color: lightblue;
+      background-color: #1e1e1e;
       font-family: Arial, sans-serif;
     }
     canvas {
-      border: 2px solid black;
-      background-color: lightgray;
+      border: 3px solid white;
+      background-color: #444; /* looks like a road */
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Car Game</h1>
+  <h1 style="color:white;">🚗 Car Game</h1>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
 
   <script>
@@ -24,12 +25,12 @@
     const ctx = canvas.getContext("2d");
 
     let car = {
-      x: 100,
-      y: 100,
+      x: 370,
+      y: 400,
       width: 60,
       height: 30,
       speed: 5,
-      color: "red"
+      color: "blue"
     };
 
     function drawCar() {
@@ -38,14 +39,14 @@
       ctx.fillRect(car.x, car.y, car.width, car.height);
 
       // Car roof
-      ctx.fillStyle = "darkred";
+      ctx.fillStyle = "lightblue";
       ctx.fillRect(car.x + 10, car.y - 15, car.width - 20, 15);
 
       // Wheels
       ctx.fillStyle = "black";
       ctx.beginPath();
-      ctx.arc(car.x + 10, car.y + car.height, 8, 0, Math.PI * 2);
-      ctx.arc(car.x + car.width - 10, car.y + car.height, 8, 0, Math.PI * 2);
+      ctx.arc(car.x + 12, car.y + car.height, 8, 0, Math.PI * 2);
+      ctx.arc(car.x + car.width - 12, car.y + car.height, 8, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -61,80 +62,7 @@
       if (e.key === "ArrowLeft" || e.key === "a") car.x -= car.speed;
       if (e.key === "ArrowRight" || e.key === "d") car.x += car.speed;
 
-      // Keep car inside canvas
-      if (car.x < 0) car.x = 0;
-      if (car.y < 0) car.y = 0;
-      if (car.x + car.width > canvas.width) car.x = canvas.width - car.width;
-      if (car.y + car.height > canvas.height) car.y = canvas.height - car.height;
-    });
-
-    update();
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Car Game</title>
-  <style>
-    body {
-      text-align: center;
-      background-color: lightblue;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      border: 2px solid black;
-      background-color: lightgray;
-    }
-  </style>
-</head>
-<body>
-  <h1>Car Game</h1>
-  <canvas id="gameCanvas" width="800" height="500"></canvas>
-
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let car = {
-      x: 100,
-      y: 100,
-      width: 60,
-      height: 30,
-      speed: 5,
-      color: "red"
-    };
-
-    function drawCar() {
-      // Car body
-      ctx.fillStyle = car.color;
-      ctx.fillRect(car.x, car.y, car.width, car.height);
-
-      // Car roof
-      ctx.fillStyle = "darkred";
-      ctx.fillRect(car.x + 10, car.y - 15, car.width - 20, 15);
-
-      // Wheels
-      ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.arc(car.x + 10, car.y + car.height, 8, 0, Math.PI * 2);
-      ctx.arc(car.x + car.width - 10, car.y + car.height, 8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawCar();
-      requestAnimationFrame(update);
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp" || e.key === "w") car.y -= car.speed;
-      if (e.key === "ArrowDown" || e.key === "s") car.y += car.speed;
-      if (e.key === "ArrowLeft" || e.key === "a") car.x -= car.speed;
-      if (e.key === "ArrowRight" || e.key === "d") car.x += car.speed;
-
-      // Keep car inside canvas
+      // Keep inside canvas
       if (car.x < 0) car.x = 0;
       if (car.y < 0) car.y = 0;
       if (car.x + car.width > canvas.width) car.x = canvas.width - car.width;
